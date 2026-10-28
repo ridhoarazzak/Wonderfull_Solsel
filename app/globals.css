@@ -71,3 +71,18 @@ footer{text-align:center;color:var(--mute);font-size:.74rem;padding:24px 16px}
 .detail{animation:flip .5s cubic-bezier(.2,.8,.2,1) both;transform-origin:top center}
 @keyframes flip{from{opacity:0;transform:rotateX(-12deg) translateY(14px)}to{opacity:1;transform:none}}
 }
+
+/* ===== Peta 3D ===== */
+.map-cta{text-align:center;padding:36px 18px}.map-cta-ico{font-size:3rem}.map-cta h3{font-family:var(--script);font-weight:400;font-size:2rem;margin:6px 0;color:var(--red)}.map-cta p{max-width:46ch;margin:0 auto 14px;color:var(--mute);font-size:.9rem}
+.mapwrap{position:relative}.mapbox{height:min(68vh,540px);border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--bg)}
+.map-msg{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--panel) 80%,transparent);color:var(--ink);font-weight:700;border-radius:20px;text-align:center;padding:20px}
+.map-tools{position:absolute;left:10px;top:10px;z-index:2}.map-tools .tab{background:var(--panel)}
+.map-legend{position:absolute;left:10px;bottom:10px;z-index:2;background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:.72rem;max-width:230px;line-height:1.5}
+.map-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 4px 0 6px;vertical-align:-2px;border:1px solid rgba(0,0,0,.15)}.map-legend small{color:var(--mute)}
+.pin-wrap{background:none;border:0;padding:0;cursor:pointer;width:26px;height:34px}
+.pin{display:block;width:22px;height:22px;margin:0 auto;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--red);border:2.5px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.nlab{font:700 10px var(--sans);color:#4A2E22;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s}
+.z-lab .nlab{opacity:1}
+.maplibregl-popup-content{font:600 .82rem var(--sans);color:#4A2E22;border-radius:12px}
+@media(prefers-reduced-motion:no-preference){.pin-wrap{animation:drop .5s cubic-bezier(.2,.8,.2,1) both}@keyframes drop{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:none}}}
+                                                   
