@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type PointerEvent } from "react";
 import { TABS, WISATA, type Place, type Tab, level, near, fmtKm, mapsUrl } from "@/lib/places";
 import { Sprite, Illustration } from "./Sprite";
+import { Map3D } from "./Map3D";
 
 const STEP = 24;
-const NAV: [Tab, string][] = [["wisata", "Beranda"], ["kuliner", "Kuliner"], ["penginapan", "Menginap"], ["kesehatan", "Kesehatan"]];
+const NAV: [Tab, string][] = [["wisata", "Beranda"], ["peta", "Peta 3D"], ["kuliner", "Kuliner"], ["penginapan", "Menginap"], ["kesehatan", "Kesehatan"]];
 const Ico = ({ c }: { c: string }) => <svg viewBox="0 0 64 64"><use href={`#i-${c}`} /></svg>;
 const Score = ({ p }: { p: Place }) => (
   <>
@@ -29,6 +30,13 @@ export function Explorer({ places, generated }: { places: Place[]; generated: st
     try { localStorage.setItem("solsel-fav3", JSON.stringify(n)); } catch {}
     return n;
   });
+  const tilt = (e: PointerEvent<HTMLButtonElement>) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--ry", `${((e.clientX - r.left) / r.width - 0.5) * 26}deg`);
+    e.currentTarget.style.setProperty("--rx", `${-((e.clientY - r.top) / r.height - 0.5) * 26}deg`);
+  };
+  const untilt = (e: PointerEvent<HTMLButtonElement>) => { e.currentTarget.style.setProperty("--rx", "0deg"); e.currentTarget.style.setProperty("--ry", "0deg"); };
   const go = (t: Tab) => { setTab(t); setFavOnly(false); setSel(null); setLim(STEP); };
 
   const list = useMemo(() => places
@@ -66,7 +74,7 @@ export function Explorer({ places, generated }: { places: Place[]; generated: st
         <section className="panel" aria-live="polite">
           <div className="tabs">{(Object.keys(TABS) as Tab[]).map((k) => <button key={k} className="tab" aria-pressed={!favOnly && k === tab} onClick={() => go(k)}>{TABS[k]}</button>)}</div>
 
-          {!p && <input className="srch" type="search" placeholder="Cari nama tempat…" aria-label="Cari nama tempat" onChange={(e) => { setQ(e.target.value.trim().toLowerCase()); setLim(STEP); }} />}
+          {!p && tab !== "peta" && <input className="srch" type="search" placeholder="Cari nama tempat…" aria-label="Cari nama tempat" onChange={(e) => { setQ(e.target.value.trim().toLowerCase()); setLim(STEP); }} />}
           {!p && tab === "wisata" && !favOnly && (
             <div className="tabs">
               <span style={{ alignSelf: "center", color: "var(--mute)", fontSize: ".8rem" }}>Keramaian zona:</span>
@@ -78,7 +86,7 @@ export function Explorer({ places, generated }: { places: Place[]; generated: st
             <div className="detail">
               {p.ph?.length ? <div className="gal">{p.ph.map((f) => <img key={f.f} src={f.f} alt={p.n} loading="lazy" />)}</div> : null}
               <h2>{p.n}</h2>
-              <div className="m">{p.r ? <><span className="star">★ {p.r}</span> · </> : null}{p.s}{p.z ? ` · ${level(p.z)} (skor ${p.z})` : ""}</div>
+              <div className="m">{p.r ? <><span className="star">★ {p.r}</span> · </> : null}{p.s}{p.nag ? ` · Nagari ${p.nag}${p.kec ? `, Kec. ${p.kec}` : ""}` : ""}{p.z ? ` · ${level(p.z)} (skor ${p.z})` : ""}</div>
               <p>{p.d ?? "Info lengkap belum tersedia di data. Buka Google Maps untuk foto dan ulasan terbaru."}</p>
               {p.h && <p className="m">Jam: {p.h}</p>}
               {p.ph?.length ? <p className="m" style={{ fontSize: ".72rem" }}>Foto: {p.ph.map((f, k) => <span key={f.f}>{k ? "; " : ""}<a href={f.l} target="_blank" rel="noopener noreferrer">{f.c}</a></span>)} (Wikimedia Commons)</p> : null}
@@ -92,11 +100,13 @@ export function Explorer({ places, generated }: { places: Place[]; generated: st
                 })}
               </div>
             </div>
+          ) : tab === "peta" && !favOnly ? (
+            <Map3D places={places} onSelect={(id) => { setSel(id); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
           ) : list.length ? (
             <>
               <div className="items">
-                {list.slice(0, lim).map((x) => (
-                  <button key={x.id} className="it" onClick={() => { setSel(x.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                {list.slice(0, lim).map((x, i) => (
+                  <button key={x.id} className="it" style={{ animationDelay: `${(i % 12) * 45}ms` }} onPointerMove={tilt} onPointerLeave={untilt} onClick={() => { setSel(x.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
                     <div className="disc">{x.ph?.[0] ? <img src={x.ph[0].f} alt={x.n} loading="lazy" /> : <Ico c={x.c} />}</div><b>{x.n}</b><span><Score p={x} /></span>
                   </button>
                 ))}
@@ -111,4 +121,5 @@ export function Explorer({ places, generated }: { places: Place[]; generated: st
       <div className="dock"><div className="logo" style={{ fontSize: "1.3rem" }}><svg width="24" height="24" viewBox="0 0 64 64"><use href="#i-budaya" /></svg>Solsel</div><em>Teh, rumah gadang, dan udara sejuk.</em><small>Sumatera Barat</small></div>
     </>
   );
-}
+         }
+    
