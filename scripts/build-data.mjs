@@ -30,6 +30,13 @@ const rate = (v, f) => { const n = num(v); if (n === null || n === 0) return nul
 const r5 = (n) => Math.round(n * 1e5) / 1e5;
 const inside = (la, lo) => la >= BBOX.latMin && la <= BBOX.latMax && lo >= BBOX.lonMin && lo <= BBOX.lonMax;
 const ov = JSON.parse(R("data/overrides.json"));
+// Batas nagari (KML -> public/nagari.geojson): dipakai untuk memastikan tempat memang di Solok Selatan dan untuk mengisi nama nagari.
+const geoPath = new URL("../public/nagari.geojson", import.meta.url);
+const GEO = fs.existsSync(geoPath) ? JSON.parse(fs.readFileSync(geoPath, "utf8")).features : null;
+const polys = GEO ? GEO.flatMap((f) => (f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates).map((p) => ({ n: f.properties.n, kec: f.properties.kec, ring: p[0] }))) : [];
+const hit = (x, y, ring) => { let c = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [xi, yi] = ring[i], [xj, yj] = ring[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c; } return c; };
+const nearKm = (x, y, ring) => { let b = 1e9; for (let i = 0; i < ring.length - 1; i++) { const [ax, ay] = ring[i], [bx, by] = ring[i + 1], dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy; const t = L ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L)) : 0; b = Math.min(b, Math.hypot(x - (ax + t * dx), y - (ay + t * dy))); } return b * 111; };
+function locate(la, lo) { for (const p of polys) if (hit(lo, la, p.ring)) return p; let best = null, d = 1e9; for (const p of polys) { const k = nearKm(lo, la, p.ring); if (k < d) { d = k; best = p; } } return d <= 0.5 ? best : null; }
 const places = [], names = new Set();
 function add(file, x) {
   if (!x.n) { warns.push(`${file}: baris tanpa nama dilewati`); return; }
@@ -37,9 +44,11 @@ function add(file, x) {
   const key = x.n.toLowerCase();
   if (names.has(key)) { dropped.push(`${x.n} (nama ganda)`); return; }
   if (x.la === null || x.lo === null) { errors.push(`${file}: "${x.n}" koordinat tidak valid`); return; }
-  if (!inside(x.la, x.lo)) { dropped.push(`${x.n} (di luar Solok Selatan)`); return; }
+  let loc = null;
+  if (GEO) { loc = locate(x.la, x.lo); if (!loc && !(ov.keep ?? []).includes(x.n)) { dropped.push(`${x.n} (di luar batas nagari Solok Selatan)`); return; } }
+  else if (!inside(x.la, x.lo)) { dropped.push(`${x.n} (di luar Solok Selatan)`); return; }
   names.add(key);
-  places.push({ id: `${key.replace(/[^a-z0-9]+/g, "-")}-${r5(x.la)}`, n: x.n, c: x.c, r: x.r ?? null, z: x.z ?? null, la: r5(x.la), lo: r5(x.lo), s: x.s, d: null, h: null, ph: [] });
+  places.push({ id: `${key.replace(/[^a-z0-9]+/g, "-")}-${r5(x.la)}`, n: x.n, c: x.c, r: x.r ?? null, z: x.z ?? null, la: r5(x.la), lo: r5(x.lo), s: x.s, d: null, h: null, ph: [], nag: loc?.n ?? null, kec: loc?.kec ?? null });
 }
 const wcat = (n) => { const s = n.toLowerCase();
   if (/hot waterboom|air panas/.test(s)) return "airpanas";
@@ -79,3 +88,4 @@ warns.forEach((w) => console.warn("PERINGATAN:", w));
 if (errors.length) { errors.forEach((e) => console.error("ERROR:", e)); process.exit(1); }
 fs.writeFileSync(new URL("../data/places.json", import.meta.url), JSON.stringify({ generated: new Date().toISOString().slice(0, 10), places }, null, 0));
 console.log(`OK: ${places.length} tempat -> data/places.json`);
+             
