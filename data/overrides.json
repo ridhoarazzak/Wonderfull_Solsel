@@ -1,0 +1,16 @@
+{
+  "_catatan": "Isi manual (deskripsi, jam, rating) disimpan di sini, terpisah dari CSV, supaya tidak hilang saat CSV diperbarui. Kunci = nama persis seperti di CSV.",
+  "drop": ["Hot Waterboom Solok Selatan"],
+  "byName": {
+    "Kawasan Nagari Saribu Rumah Gadang": {"r": 4.6, "h": "Sen–Rab, Sab–Min 09.30–17.30 · Kamis sampai 13.30 · Jumat tutup", "d": "Kampung dengan ratusan rumah gadang gaya Minangkabau dalam satu kawasan. Naik menara pandang untuk melihat seluruh kampung, dan kamu bisa memesan pertunjukan silat atau randai. Beberapa rumah bisa disewa untuk menginap."},
+    "Kebun Teh Liki": {"r": 4.4, "h": "Buka 24 jam", "d": "Kebun teh peninggalan masa kolonial yang masih produktif. Ada kafe untuk menikmati teh, kopi, dan gorengan sambil melihat hamparan hijau."},
+    "Goa Batu Kapal": {"r": 4.3, "h": "Setiap hari 07.00–17.00", "d": "Gua alam di kawasan geopark dengan sungai kecil dan jembatan di dalamnya. Bawa senter dan air minum, serta hati-hati lumut licin."},
+    "Puncak Pinang Awan": {"r": 4.5, "h": "Buka 24 jam", "d": "Titik pandang dengan udara segar, paling cantik pagi atau sore hari. Pengunjung menyarankan datang bersama warga lokal agar akses lebih mudah."},
+    "Hot Waterboom Sapan Maluluang": {"r": 3.8, "h": "Setiap hari 08.00–17.00", "d": "Pemandian air panas alami dengan kolam rendam, kolam terapi terpisah pria dan wanita, kolam anak, dan seluncuran."},
+    "Shelter Penginapan di Solok Selatan": {"h": "Buka 24 jam", "d": "Penginapan bersih dengan air panas, AC, dan sarapan, plus kafe dengan pemandangan kebun teh Liki dan Gunung Kerinci."}
+  },
+  "extras": [
+    {"n": "Azura Hotel Padang Aro", "c": "penginapan", "r": 4.1, "z": null, "la": -1.54752, "lo": 101.25048, "s": "Hotel", "h": "Buka 24 jam", "d": "Hotel sederhana lima menit jalan kaki dari pusat Padang Aro. Pilih kamar dengan atau tanpa AC; sarapan diantar ke kamar."},
+    {"n": "Puncak BRJ", "c": "kuliner", "r": 4.2, "z": null, "la": -1.60353, "lo": 101.25314, "s": "Rumah makan", "h": "Sen–Kam, Sab–Min 10.00–18.15 · Jumat tutup", "d": "Rumah makan dengan pemandangan alam yang sejuk dan banyak sudut foto, lengkap dengan kopi."}
+  ]
+}
